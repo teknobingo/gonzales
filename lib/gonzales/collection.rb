@@ -22,16 +22,49 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 module Gonzales
-  autoload :Collection, 'gonzales/collection'
-  autoload :Factories,  'gonzales/factories'
-  autoload :TestHelper, 'gonzales/test_helper'  
-  def self.initialize!
-    STDERR.puts 'Gonzales: Loading factory module'
-    load Rails.root.join('test', 'gonzales.rb')
+  class Collection
+    class << self
+      attr_reader :entities
+      
+      def add(factory_name, entity)
+        entities ||= {}
+        entities[factory_name] = { :class => entity.class.to_s, :id => entity.id }
+        dirty
+      end
+      
+      def entities
+        @entities ||= load
+      end
+      
+      def entity(factory_name)
+        if e = entities[factory_name]
+          e[:class].constantize.find e[:id]
+        end
+      end
+      
+    private
+      def cache_filename
+        @name ||= Rails.root.join('tmp', 'speedy.yml')
+      end
+
+      def dirty #:nodoc:
+        # unless @dirty
+        #   @dirty = true
+        #   ObjectSpace.define_finalizer(self, proc {
+        #     File.open(Rails.root.join('tmp', 'speedy.yml'), "w+") do |file|
+        #       file.write @entities.to_yaml
+        #     end
+        #   })
+        # end
+        # Expect finalizer not to work, so...
+        File.open(Rails.root.join('tmp', 'speedy.yml'), "w+") do |file|
+          file.write @entities.to_yaml
+        end
+      end
+      
+      def load #:nodoc:
+        YAML::load_file cache_filename
+      end      
+    end
   end
 end
-
-require 'gonzales/factory_girl/dsl'
-require 'factory_girl'
-FactoryGirl::Syntax::Default::DSL.send(:include, Gonzales::FactoryGirl::DSL)
-ActiveSupport::TestCase.send(:include, Gonzales::TestHelper)

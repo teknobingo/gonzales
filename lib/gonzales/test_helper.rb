@@ -21,17 +21,11 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+require 'factory_girl'
 module Gonzales
-  autoload :Collection, 'gonzales/collection'
-  autoload :Factories,  'gonzales/factories'
-  autoload :TestHelper, 'gonzales/test_helper'  
-  def self.initialize!
-    STDERR.puts 'Gonzales: Loading factory module'
-    load Rails.root.join('test', 'gonzales.rb')
+  module TestHelper
+    def speedy(factory_name, *options)
+      Collection.entity(factory_name) || Factory.create(factory_name, *options)
+    end
   end
 end
-
-require 'gonzales/factory_girl/dsl'
-require 'factory_girl'
-FactoryGirl::Syntax::Default::DSL.send(:include, Gonzales::FactoryGirl::DSL)
-ActiveSupport::TestCase.send(:include, Gonzales::TestHelper)

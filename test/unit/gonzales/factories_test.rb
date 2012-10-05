@@ -21,17 +21,25 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-module Gonzales
-  autoload :Collection, 'gonzales/collection'
-  autoload :Factories,  'gonzales/factories'
-  autoload :TestHelper, 'gonzales/test_helper'  
-  def self.initialize!
-    STDERR.puts 'Gonzales: Loading factory module'
-    load Rails.root.join('test', 'gonzales.rb')
+require 'test_helper'
+
+class Gonzales::FactoriesTest < ActiveSupport::TestCase
+
+  context 'speedy' do
+    should 'set collection to factory created by factory girl' do
+      Factory.expects(:create).with('panchos').returns('hideaway')
+      Gonzales::Collection.expects(:add).with('panchos', 'hideaway').twice
+      Gonzales::Factories.speedy('panchos')
+      Factory.expects(:create).with('panchos', :merry => 'Melodies' ).returns('hideaway')
+      Gonzales::Factories.speedy('panchos', :merry => 'Melodies')
+    end
+  end
+  
+  context 'load' do
+    should 'yield context' do
+      Gonzales::Factories.load do |context|
+        assert_equal Gonzales::Factories, context
+      end
+    end
   end
 end
-
-require 'gonzales/factory_girl/dsl'
-require 'factory_girl'
-FactoryGirl::Syntax::Default::DSL.send(:include, Gonzales::FactoryGirl::DSL)
-ActiveSupport::TestCase.send(:include, Gonzales::TestHelper)

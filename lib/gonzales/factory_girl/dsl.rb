@@ -22,16 +22,16 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 module Gonzales
-  autoload :Collection, 'gonzales/collection'
-  autoload :Factories,  'gonzales/factories'
-  autoload :TestHelper, 'gonzales/test_helper'  
-  def self.initialize!
-    STDERR.puts 'Gonzales: Loading factory module'
-    load Rails.root.join('test', 'gonzales.rb')
+  module FactoryGirl
+    module DSL
+      def speedy(factory_name, attribute = nil)
+        attribute ||= factory_name
+        after_build do |r| 
+          unless r.send(attribute)
+            r.send("#{attribute}=", Gonzales::Collection.entity(factory_name) || Factory.create(factory_name))
+          end
+        end
+      end
+    end
   end
 end
-
-require 'gonzales/factory_girl/dsl'
-require 'factory_girl'
-FactoryGirl::Syntax::Default::DSL.send(:include, Gonzales::FactoryGirl::DSL)
-ActiveSupport::TestCase.send(:include, Gonzales::TestHelper)

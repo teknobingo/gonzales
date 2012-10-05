@@ -21,17 +21,24 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-module Gonzales
-  autoload :Collection, 'gonzales/collection'
-  autoload :Factories,  'gonzales/factories'
-  autoload :TestHelper, 'gonzales/test_helper'  
-  def self.initialize!
-    STDERR.puts 'Gonzales: Loading factory module'
-    load Rails.root.join('test', 'gonzales.rb')
+require 'test_helper'
+
+class Gonzales::TestHelperTest < ActiveSupport::TestCase
+  include 
+  context 'speedy' do
+    should 'return entity if cached' do
+      Gonzales::Collection.expects(:entity).with(:manolo).returns(:munoz)
+      assert_equal :munoz, speedy(:manolo)
+    end
+    should 'call factory if not cached' do
+      Gonzales::Collection.expects(:entity).with(:manolo).returns(nil)
+      Factory.expects(:create).with(:manolo).returns(:munoz)
+      assert_equal :munoz, speedy(:manolo)
+    end
+    should 'call factory with parameters if not cached' do
+      Gonzales::Collection.expects(:entity).with(:elmer).returns(nil)
+      Factory.expects(:create).with(:elmer, :fudd).returns(:midd)
+      assert_equal :midd, speedy(:elmer, :fudd)      
+    end
   end
 end
-
-require 'gonzales/factory_girl/dsl'
-require 'factory_girl'
-FactoryGirl::Syntax::Default::DSL.send(:include, Gonzales::FactoryGirl::DSL)
-ActiveSupport::TestCase.send(:include, Gonzales::TestHelper)

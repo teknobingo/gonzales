@@ -1,4 +1,7 @@
-# desc "Explaining what the task does"
-# task :gonzales do
-#   # Task goes here
-# end
+namespace :db do
+  namespace :test do
+    task :prepare => :environment do
+      Gonzales.initialize!
+    end
+  end
+end
