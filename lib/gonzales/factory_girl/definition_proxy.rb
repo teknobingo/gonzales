@@ -23,12 +23,32 @@
 
 module Gonzales
   module FactoryGirl
-    module DSL
-      def speedy(factory_name, attribute = nil)
-        attribute ||= factory_name
+    # = Gonzales::FactoryGirl::DefinitionProxy
+    #
+    # Extends FactoryGirl with a new extension
+    module DefinitionProxy
+      # Define an association in a factory.
+      #
+      # speedy will assign the association in the following order:
+      #
+      #   #. If you have specified the association then insgtantiating creating or building the factory,
+      #      it will use that association
+      #   #. If the association exists in the database, it will assign that.
+      #   #. Lastly, when none of the above, it will create the factory.
+      #
+      # === Arguments
+      #   
+      #  * association_name - the name of the association
+      #  * factory_name - the name of the factory (if the factory has the same name as the association, this parameter is optional)
+      #  * options - a hash to be passed to FactoryGirl when creating the record using factory
+      #
+      def speedy(attribute_or_factory, *args)
+        attribute = attribute_or_factory
+        options = args.extract_options!
+        factory_name = args.first || attribute
         after_build do |r| 
           unless r.send(attribute)
-            r.send("#{attribute}=", Gonzales::Collection.entity(factory_name) || Factory.create(factory_name))
+            r.send("#{attribute}=", Gonzales::Collection.entity(factory_name) || Factory.create(factory_name, options))
           end
         end
       end

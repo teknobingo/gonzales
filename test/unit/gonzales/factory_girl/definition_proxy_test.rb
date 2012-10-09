@@ -23,10 +23,10 @@
 
 require 'test_helper'
 
-class Gonzales::FactoryGirl::DSLTest < ActiveSupport::TestCase
+class Gonzales::FactoryGirl::DefinitionProxyTest < ActiveSupport::TestCase
 
-  class DSLTest
-    include Gonzales::FactoryGirl::DSL
+  class DefinitionProxyTest
+    include Gonzales::FactoryGirl::DefinitionProxy
     
     attr_accessor :sylvester
     
@@ -36,38 +36,38 @@ class Gonzales::FactoryGirl::DSLTest < ActiveSupport::TestCase
   end
   
   setup do
-    @dsl = DSLTest.new
+    @proxy = DefinitionProxyTest.new
   end
   
   
   context 'speedy association' do
     setup do
-      @dsl.sylvester = nil
+      @proxy.sylvester = nil
     end
     should 'instantiate factory with default attribute' do
       Gonzales::Collection.expects(:entity).with(:sylvester).returns(nil)
-      Factory.expects(:create).with(:sylvester).returns(:cat)
-      @dsl.speedy(:sylvester)
-      assert_equal :cat, @dsl.sylvester
+      Factory.expects(:create).with(:sylvester, {}).returns(:cat)
+      @proxy.speedy(:sylvester)
+      assert_equal :cat, @proxy.sylvester
     end
     should 'instantiate factory with defined attribute' do
       Gonzales::Collection.expects(:entity).with(:elmer).returns(nil)
-      Factory.expects(:create).with(:elmer).returns(:cat)
-      @dsl.speedy(:elmer, :sylvester)
-      assert_equal :cat, @dsl.sylvester
+      Factory.expects(:create).with(:elmer, {}).returns(:cat)
+      @proxy.speedy(:sylvester, :elmer)
+      assert_equal :cat, @proxy.sylvester
     end
     should 'not try to instantiate factory or find entity from cache if attribute is set' do
-      @dsl.sylvester = :already_set
+      @proxy.sylvester = :already_set
       Gonzales::Collection.expects(:entity).never
       Factory.expects(:create).never
-      @dsl.speedy(:sylvester)
-      assert_equal :already_set, @dsl.sylvester
+      @proxy.speedy(:sylvester)
+      assert_equal :already_set, @proxy.sylvester
     end
     should 'load entity from cache if it is there' do
       Gonzales::Collection.expects(:entity).with(:sylvester).returns(:cat)
       Factory.expects(:create).never
-      @dsl.speedy(:sylvester)
-      assert_equal :cat, @dsl.sylvester
+      @proxy.speedy(:sylvester)
+      assert_equal :cat, @proxy.sylvester
     end
   end
     
