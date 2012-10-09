@@ -6,7 +6,11 @@ source "http://rubygems.org"
 gemspec
 
 gem "jquery-rails"
-
 gem 'factory_girl_rails'
-gem 'shoulda'
-gem 'mocha'
+gem 'shoulda' #, :require => false
+
+
+group :test do
+  gem 'mocha'
+end
+
