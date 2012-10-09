@@ -21,17 +21,52 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+require 'active_support/configurable'
+
 module Gonzales
+  # = Gonzales provides a mechanism for speeding up tests when using FactoryGirl
+  #
+  # == Configutations
+  #
+  #   * factory_module - the module containing the definitions of factories to be store in the test database.
+  #                      Defaults to +test/gonzales.rb+
+  #   * factory_cache  - the entity lookup yaml-file to store factories that was save to the database when Gonzales.initialize! was run
+  #                      Defaults to +test/speedy.yml+
+  #
+  # === Example 
+  #
+  # Gonzales.configure do |config|
+  #   config.factory_module = Rails.root.join('tmp', 'gonzales.yml')
+  #   config.factory_cache =  Rails.root.join('test', 'speedy.rb')
+  # end
+  
   autoload :Collection, 'gonzales/collection'
   autoload :Factories,  'gonzales/factories'
-  autoload :TestHelper, 'gonzales/test_helper'  
+  autoload :TestHelper, 'gonzales/test_helper'
+  
+  include ActiveSupport::Configurable
+  config_accessor :factory_module, :factory_cache
+  
+  # Runs the initialization of Gonzales. Put this in a rake task for your application.
+  #
+  # === Example
+  #
+  #   # lib/tasks/gonzales_tasks.rake
+  #   namespace :db do
+  #     namespace :test do
+  #       task :prepare => :environment do
+  #         # place your seeds here, if you have any
+  #         Gonzales.initialize!
+  #       end
+  #     end
+  #   end
+  #
   def self.initialize!
-    STDERR.puts 'Gonzales: Loading factory module'
-    load Rails.root.join('test', 'gonzales.rb')
+    load factory_module || Rails.root.join('test', 'gonzales.rb')
   end
 end
 
-require 'gonzales/factory_girl/dsl'
+require 'gonzales/factory_girl/definition_proxy'
 require 'factory_girl'
-FactoryGirl::Syntax::Default::DSL.send(:include, Gonzales::FactoryGirl::DSL)
+FactoryGirl::DefinitionProxy.send(:include, Gonzales::FactoryGirl::DefinitionProxy)
 ActiveSupport::TestCase.send(:include, Gonzales::TestHelper)

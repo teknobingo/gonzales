@@ -22,48 +22,48 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 module Gonzales
+  # = Gonzales::Collection
+  #
+  # Holds references to the factories instantiated during db:test:prepare
   class Collection
     class << self
-      attr_reader :entities
       
-      def add(factory_name, entity)
-        entities ||= {}
-        entities[factory_name] = { :class => entity.class.to_s, :id => entity.id }
-        dirty
+      # Adds an object (entity) to the collection.
+      def add(name, object)
+        entities[name] = { :class => object.class.to_s, :id => object.id }
       end
       
+      # Retrieves the collection of entities.
+      # If they are not already loded from the temporary cache map, the map is loaded.
       def entities
-        @entities ||= load
+        @@entities ||= load
       end
       
+      # Retrieves a specific object
       def entity(factory_name)
         if e = entities[factory_name]
           e[:class].constantize.find e[:id]
         end
       end
-      
-    private
-      def cache_filename
-        @name ||= Rails.root.join('tmp', 'speedy.yml')
-      end
 
-      def dirty #:nodoc:
-        # unless @dirty
-        #   @dirty = true
-        #   ObjectSpace.define_finalizer(self, proc {
-        #     File.open(Rails.root.join('tmp', 'speedy.yml'), "w+") do |file|
-        #       file.write @entities.to_yaml
-        #     end
-        #   })
-        # end
-        # Expect finalizer not to work, so...
-        File.open(Rails.root.join('tmp', 'speedy.yml'), "w+") do |file|
-          file.write @entities.to_yaml
+      # Save a collection map to temporary file
+      def save #:nodoc:
+        File.open(cache_filename, "w+") do |file|
+          file.write entities.to_yaml
         end
       end
       
+    private
+      def cache_filename #:nodoc:
+        @@cache_filename ||= Gonzales.factory_cache || Rails.root.join('tmp', 'speedy.yml')
+      end
+
       def load #:nodoc:
-        YAML::load_file cache_filename
+        begin
+          YAML::load_file cache_filename
+        rescue Errno::ENOENT
+          {}
+        end
       end      
     end
   end

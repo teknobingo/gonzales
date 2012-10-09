@@ -27,16 +27,24 @@ class Gonzales::FactoriesTest < ActiveSupport::TestCase
 
   context 'speedy' do
     should 'set collection to factory created by factory girl' do
-      Factory.expects(:create).with('panchos').returns('hideaway')
+      Factory.expects(:create).with('panchos', {}).returns('hideaway')
       Gonzales::Collection.expects(:add).with('panchos', 'hideaway').twice
       Gonzales::Factories.speedy('panchos')
       Factory.expects(:create).with('panchos', :merry => 'Melodies' ).returns('hideaway')
       Gonzales::Factories.speedy('panchos', :merry => 'Melodies')
     end
+    should 'support alias name' do
+      Factory.expects(:create).with('panchos', {}).returns('hideaway')
+      Gonzales::Collection.expects(:add).with('villa', 'hideaway').twice
+      Gonzales::Factories.speedy('villa', 'panchos')
+      Factory.expects(:create).with('panchos', :merry => 'Melodies' ).returns('hideaway')
+      Gonzales::Factories.speedy('villa','panchos', :merry => 'Melodies')
+    end
   end
   
   context 'load' do
     should 'yield context' do
+      Gonzales::Collection.expects(:save).once
       Gonzales::Factories.load do |context|
         assert_equal Gonzales::Factories, context
       end

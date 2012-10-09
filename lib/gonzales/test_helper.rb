@@ -23,7 +23,27 @@
 
 require 'factory_girl'
 module Gonzales
+  # = Gonzales::TestHelper
+  #
+  # Helper to be used when writing tests when you use Gonzales
   module TestHelper
+    # returns a created record to be used in tests
+    #
+    # speedy will return the record from the database if it alreday exists in the test database.
+    # If not it will call FactoryGirl to instantiate the record.
+    #
+    # === Arguments
+    #
+    #   * factory_name - Name of the factory or the alias specified in the gonzales file
+    #   * options - will be passed to FactoryGirl if the factory does not exist in the test database.
+    #     Note!! options will not be passed to Gonzales. 
+    #
+    # === Example
+    #
+    #   setup do
+    #     @person = speedy :person
+    #   end
+    #
     def speedy(factory_name, *options)
       Collection.entity(factory_name) || Factory.create(factory_name, *options)
     end

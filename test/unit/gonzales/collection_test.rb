@@ -27,48 +27,52 @@ class Gonzales::CollectionTest < ActiveSupport::TestCase
   
   setup do
     @coll = Gonzales::Collection
+    @entities = stub('entities')
+    @coll.stubs(:entities).returns(@entities)
   end
-  
+    
   context 'private method' do
-    context 'dirty' do
+    context 'save' do
       should 'save file immediately, since destructor is a unknown thing in ruby' do
-        entities = stub('entities')
-        @coll.instance_variable_set(:@entities, entities)
-        entities.expects(:to_yaml).returns('xyz')
+        @entities.expects(:to_yaml).returns('xyz')
         file = stub('file')
         File.expects(:open).with(Rails.root.join('tmp','speedy.yml'), 'w+').yields(file)
         file.expects(:write).with('xyz')
-        @coll.send(:dirty)
+        @coll.send(:save)
       end
     end
     context 'load' do
-      # YAML.expects(:load_file).with( Rails.root.join('tmp','speedy.yml'))
-      # @coll.send(:load)
+      should 'load file from tmp' do
+        Gonzales.factory_cache = nil
+        YAML.expects(:load_file).with( Rails.root.join('tmp','speedy.yml'))
+        @coll.send(:load)
+      end
+      should 'handle that file does not exist' do
+      end
     end
   end
   
   context 'publich method' do
-    context 'add' do
+    context 'add' do      
       should 'store entity' do
         class Entity
           def id
             5
           end
         end
-        @coll.expects(:dirty).once
-        @coll.entities.expects(:[]=).with(:gonzales, :class => 'Gonzales::CollectionTest::Entity', :id => 5)
-        @coll.add(:gonzales, Entity.new)      
+        @entities.expects(:[]=).with(:gonzales, :class => 'Gonzales::CollectionTest::Entity', :id => 5)
+        @coll.add(:gonzales, Entity.new)
       end
     end
     context 'entity' do
       should 'find record if it has been cached' do
         Entity.expects(:find).with(2).returns(:midd)
-        @coll.entities.expects(:[]).with(:entity).returns({:class => 'Gonzales::CollectionTest::Entity', :id => 2})
+        @entities.expects(:[]).with(:entity).returns({:class => 'Gonzales::CollectionTest::Entity', :id => 2})
         assert_equal :midd, @coll.entity(:entity)
       end
       should 'return nothing if not cached' do
         Entity.expects(:find).never
-        @coll.entities.expects(:[]).with(:entity).returns(nil)
+        @entities.expects(:[]).with(:entity).returns(nil)
         assert_nil @coll.entity(:entity)
       end
     end

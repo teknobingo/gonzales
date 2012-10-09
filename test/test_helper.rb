@@ -9,7 +9,7 @@ Rails.backtrace_cleaner.remove_silencers!
 # Load support files
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
-# Load fixtures from the engine
-if ActiveSupport::TestCase.method_defined?(:fixture_path=)
-  ActiveSupport::TestCase.fixture_path = File.expand_path("../fixtures", __FILE__)
+Gonzales.configure do |config|
+  config.factory_module = Rails.root.join('test', 'dummy', 'tmp', 'speedy.yml')
+  config.factory_cache =  Rails.root.join('test', 'dummy', 'test', 'gonzales.rb')
 end
