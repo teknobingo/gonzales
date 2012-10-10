@@ -49,6 +49,7 @@ module Gonzales
     
     # Yields a block to define speedy statements, then saves a collection of references to a temporary file
     def self.load(&block)
+      ::FactoryGirl.reload
       yield self
       Collection.save
     end

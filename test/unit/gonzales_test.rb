@@ -8,7 +8,7 @@ class GonzalesTest < ActiveSupport::TestCase
   context 'initializing' do
     should 'load factory_file' do
       Gonzales.factory_module = nil
-      Gonzales.expects(:load).with(Rails.root.join('test', 'gonzales.rb'))
+      Gonzales.expects(:load).with(Rails.root.join('test', 'speedy.rb'))
       Gonzales.initialize!
     end
   end

@@ -29,7 +29,7 @@ module Gonzales
   # == Configutations
   #
   #   * factory_module - the module containing the definitions of factories to be store in the test database.
-  #                      Defaults to +test/gonzales.rb+
+  #                      Defaults to +test/speedy.rb+
   #   * factory_cache  - the entity lookup yaml-file to store factories that was save to the database when Gonzales.initialize! was run
   #                      Defaults to +test/speedy.yml+
   #
@@ -62,7 +62,7 @@ module Gonzales
   #   end
   #
   def self.initialize!
-    load factory_module || Rails.root.join('test', 'gonzales.rb')
+    load factory_module || Rails.root.join('test', 'speedy.rb')
   end
 end
 

@@ -23,10 +23,10 @@ Or, in your Gemfile
     
 ## Initializing your factories before the tests are running
 
-Define a file in your test directory called gonzales.rb. Enlist all the factories you want to load before tests are running using the ```speedy``` command.
+Define a file in your test directory called speedy.rb. Enlist all the factories you want to load before tests are running using the ```speedy``` command.
 
 ``` Ruby
-# test/gonzales.rb
+# test/speedy.rb
 Gonzales::Factories.load do |go|
   go.speedy :address
   go.speedy :organization
@@ -60,7 +60,7 @@ A model with many associations may be very slow to instantiate. Lets say you hav
 You will use the keyword ```speedy``` with factory girl to define associations
 
 ``` Ruby
-# test/gonzales.rb
+# test/factories.rb
 FactoryGirl.define do
   
   factory :organization do

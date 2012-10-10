@@ -11,5 +11,5 @@ Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 Gonzales.configure do |config|
   config.factory_module = Rails.root.join('test', 'dummy', 'tmp', 'speedy.yml')
-  config.factory_cache =  Rails.root.join('test', 'dummy', 'test', 'gonzales.rb')
+  config.factory_cache =  Rails.root.join('test', 'dummy', 'test', 'speedy.rb')
 end
