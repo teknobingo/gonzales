@@ -16,5 +16,21 @@ class OutfitTest < ActiveSupport::TestCase
       assert_equal 'Narrow', outfit.hat.brim_type
     end
   end
+  context 'outfit' do
+    should 'have alternative thats association loaded' do
+      outfit = speedy(:outfit)
+      assert_equal 1, outfit.alternative_hats.size
+      assert_equal 'Cool', outfit.alternative_hats.first.brim_type
+    end
+  end
+  context 'exploring factory_girl' do
+    should 'explore possibilities' do
+      outfit = speedy(:girl_outfit)    
+      assert_equal 'Fat', outfit.hat.brim_type
+      assert_equal 'Classy', outfit.shoe.name
+      assert_equal 1, outfit.alternative_hats.size
+      assert_equal 'Narrow', outfit.alternative_hats.first.brim_type
+    end
+  end
 end
 

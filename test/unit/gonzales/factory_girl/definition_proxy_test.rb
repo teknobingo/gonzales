@@ -29,6 +29,7 @@ class Gonzales::FactoryGirl::DefinitionProxyTest < ActiveSupport::TestCase
     include Gonzales::FactoryGirl::DefinitionProxy
     
     attr_accessor :sylvester
+    attr_accessor :cartoons
     
     def after_build
       yield self
@@ -43,20 +44,24 @@ class Gonzales::FactoryGirl::DefinitionProxyTest < ActiveSupport::TestCase
   context 'speedy association' do
     setup do
       @proxy.sylvester = nil
+      @reflection = stub('reflection', :macro => :belongs_to)
     end
     should 'instantiate factory with default attribute' do
+      DefinitionProxyTest.expects(:reflect_on_association).with(:sylvester).returns(@reflection)
       Gonzales::Collection.expects(:entity).with(:sylvester).returns(nil)
       Factory.expects(:create).with(:sylvester, {}).returns(:cat)
       @proxy.speedy(:sylvester)
       assert_equal :cat, @proxy.sylvester
     end
     should 'instantiate factory with defined attribute' do
+      DefinitionProxyTest.expects(:reflect_on_association).with(:sylvester).returns(@reflection)
       Gonzales::Collection.expects(:entity).with(:elmer).returns(nil)
       Factory.expects(:create).with(:elmer, {}).returns(:cat)
       @proxy.speedy(:sylvester, :elmer)
       assert_equal :cat, @proxy.sylvester
     end
     should 'not try to instantiate factory or find entity from cache if attribute is set' do
+      DefinitionProxyTest.expects(:reflect_on_association).with(:sylvester).returns(@reflection)
       @proxy.sylvester = :already_set
       Gonzales::Collection.expects(:entity).never
       Factory.expects(:create).never
@@ -64,11 +69,47 @@ class Gonzales::FactoryGirl::DefinitionProxyTest < ActiveSupport::TestCase
       assert_equal :already_set, @proxy.sylvester
     end
     should 'load entity from cache if it is there' do
+      DefinitionProxyTest.expects(:reflect_on_association).with(:sylvester).returns(@reflection)
       Gonzales::Collection.expects(:entity).with(:sylvester).returns(:cat)
       Factory.expects(:create).never
       @proxy.speedy(:sylvester)
       assert_equal :cat, @proxy.sylvester
     end
   end
-    
+
+  context 'speedy has_many and has_and_belongs_to_many association' do
+    setup do
+      @proxy.cartoons = []
+    end
+    should 'associate array for one element' do
+      macro = :has_many
+      reflection = stub('reflection', :macro => macro)
+      DefinitionProxyTest.expects(:reflect_on_association).with(:cartoons).returns(reflection)
+      Gonzales::Collection.expects(:entity).with(:sylvester).returns(:cat)
+      Factory.expects(:create).never
+      @proxy.speedy(:cartoons, :sylvester)
+      assert_equal [:cat], @proxy.cartoons, "Association failed for macro: #{macro}"
+    end
+    should 'associate many elements as array' do
+      macro = :has_and_belongs_to_many
+      reflection = stub('reflection', :macro => macro)
+      DefinitionProxyTest.expects(:reflect_on_association).with(:cartoons).returns(reflection)
+      Gonzales::Collection.expects(:entity).with(:sylvester).returns(:cat)
+      Gonzales::Collection.expects(:entity).with(:elmer).returns(:man)
+      Factory.expects(:create).never
+      @proxy.speedy(:cartoons, :sylvester, :elmer)
+      assert_equal [:cat, :man], @proxy.cartoons, "Association failed for macro: #{macro}"
+    end
+    should 'not try to instantiate factory or find entity from cache if attribute is set' do
+      @proxy.cartoons = [:dog]
+      macro = :has_many
+      reflection = stub('reflection', :macro => macro)
+      DefinitionProxyTest.expects(:reflect_on_association).with(:cartoons).returns(reflection)
+      Gonzales::Collection.expects(:entity).never
+      Factory.expects(:create).never
+      @proxy.speedy(:cartoons, :sylvester)
+      assert_equal [:dog], @proxy.cartoons, "Association failed for macro: #{macro}"
+    end
+  end
+  
 end

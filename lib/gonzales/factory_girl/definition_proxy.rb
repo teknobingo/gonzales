@@ -45,13 +45,20 @@ module Gonzales
       def speedy(attribute_or_factory, *args)
         attribute = attribute_or_factory
         options = args.extract_options!
-        factory_name = args.first || attribute
-        after_build do |r| 
-          unless r.send(attribute)
+        after_build do |r|
+          if r.class.reflect_on_association(attribute).macro.to_s.include? 'many'
+            if r.send(attribute).size == 0
+              factory_names = args.size > 0 ? args : [attribute]
+              r.send("#{attribute}=",
+                factory_names.collect { |factory_name| Gonzales::Collection.entity(factory_name) || Factory.create(factory_name, options) }) 
+            end
+          elsif !r.send(attribute)
+            factory_name = args.first || attribute
             r.send("#{attribute}=", Gonzales::Collection.entity(factory_name) || Factory.create(factory_name, options))
           end
         end
       end
+
     end
   end
 end

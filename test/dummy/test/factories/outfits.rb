@@ -5,5 +5,12 @@ FactoryGirl.define do
     style "Mexican"
     speedy :shoe, :boot
     speedy :hat, :sombrero
+    alternative_hats { |outfit| [outfit.association(:stetson)]  }
+  end
+  factory :girl_outfit, :class => Outfit do
+    style "Mexican"
+    speedy :shoe
+    speedy :hat
+    speedy :alternative_hats, :sombrero
   end
 end

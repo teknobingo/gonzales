@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121009091652) do
+ActiveRecord::Schema.define(:version => 20121010161218) do
 
   create_table "hats", :force => true do |t|
     t.string   "brim_type"
@@ -19,6 +19,14 @@ ActiveRecord::Schema.define(:version => 20121009091652) do
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
+
+  create_table "hats_outfits", :force => true do |t|
+    t.integer "hat_id"
+    t.integer "outfit_id"
+  end
+
+  add_index "hats_outfits", ["hat_id"], :name => "index_hats_outfits_on_hat_id"
+  add_index "hats_outfits", ["outfit_id"], :name => "index_hats_outfits_on_outfit_id"
 
   create_table "materials", :force => true do |t|
     t.string   "name"
