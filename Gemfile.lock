@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    gonzales (0.0.1)
+    gonzales (0.5.0)
       factory_girl (>= 2.3.2)
       rails (>= 3.0.1)
 
