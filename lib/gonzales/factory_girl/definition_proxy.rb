@@ -28,6 +28,7 @@ module Gonzales
     # Extends FactoryGirl with a new extension
     module DefinitionProxy
       # Define an association in a factory.
+      # Supports belongs_to and has_and_belongs_to_many associations
       #
       # speedy will assign the association in the following order:
       #
@@ -42,11 +43,23 @@ module Gonzales
       #  * factory_name - the name of the factory (if the factory has the same name as the association, this parameter is optional)
       #  * options - a hash to be passed to FactoryGirl when creating the record using factory
       #
+      # === Examples
+      #
+      #    FactoryGirl.define do
+      #      factory :organization do
+      #        name "Looney tunes"
+      #        speedy :contact                                      # association to contact (belongs_to :contact), 
+      #               # same as +association :contact+
+      #        speedy :addresses, :street_address, :postal_address  # association to addresses (has_many_and_belongs_to_many :addresses)
+      #               # same as +addresses { |org| [org.association(:street_address), org.association(:postal_address)] }+
+      #      end
+      #    end
+      #
       def speedy(attribute_or_factory, *args)
         attribute = attribute_or_factory
         options = args.extract_options!
         after_build do |r|
-          if r.class.reflect_on_association(attribute).macro.to_s.include? 'many'
+          if r.class.reflect_on_association(attribute).macro.to_s.include? 'has_and_belongs_to_many'
             if r.send(attribute).size == 0
               factory_names = args.size > 0 ? args : [attribute]
               r.send("#{attribute}=",

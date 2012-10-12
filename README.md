@@ -85,7 +85,7 @@ end
 In practice the ```speedy``` association command does something like this:
 
 ``` Ruby
-  after_build { |r| r.organization = pre_create_organization || Factory.create(:organization) unless r.organization }
+  after_build { |r| r.organization = pre_created_organization || Factory.create(:organization) unless r.organization }
 ```
 
 ## Instantiating a pre-created object defined with factory girl using speedy

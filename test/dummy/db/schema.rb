@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121010161218) do
+ActiveRecord::Schema.define(:version => 20121011131724) do
 
   create_table "hats", :force => true do |t|
     t.string   "brim_type"
@@ -38,8 +38,9 @@ ActiveRecord::Schema.define(:version => 20121010161218) do
     t.string   "style"
     t.integer  "shoe_id"
     t.integer  "hat_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+    t.integer  "wardrobe_id"
   end
 
   add_index "outfits", ["hat_id"], :name => "index_outfits_on_hat_id"
@@ -58,5 +59,11 @@ ActiveRecord::Schema.define(:version => 20121010161218) do
   add_index "shoes", ["inner_material_id"], :name => "index_shoes_on_inner_material_id"
   add_index "shoes", ["lower_material_id"], :name => "index_shoes_on_lower_material_id"
   add_index "shoes", ["upper_material_id"], :name => "index_shoes_on_upper_material_id"
+
+  create_table "wardrobes", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
 end

@@ -81,15 +81,6 @@ class Gonzales::FactoryGirl::DefinitionProxyTest < ActiveSupport::TestCase
     setup do
       @proxy.cartoons = []
     end
-    should 'associate array for one element' do
-      macro = :has_many
-      reflection = stub('reflection', :macro => macro)
-      DefinitionProxyTest.expects(:reflect_on_association).with(:cartoons).returns(reflection)
-      Gonzales::Collection.expects(:entity).with(:sylvester).returns(:cat)
-      Factory.expects(:create).never
-      @proxy.speedy(:cartoons, :sylvester)
-      assert_equal [:cat], @proxy.cartoons, "Association failed for macro: #{macro}"
-    end
     should 'associate many elements as array' do
       macro = :has_and_belongs_to_many
       reflection = stub('reflection', :macro => macro)
