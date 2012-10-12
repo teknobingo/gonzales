@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.homepage    = "https://github.com/teknobingo/gonzales"
   s.summary     = "Gonzales speeds up unit teste when using factory_girl"
   s.description = <<THE_END
-  Gonzales makes the best out of FactoryGirl, by allowing you to load the factories into the database before the tests starts. 
+  Gonzales makes the best out of factory_girl (FactoryGirl), by allowing you to load the factories into the database before the tests starts. 
   You just have to learn one new keyword - 'speedy'.
 THE_END
 
