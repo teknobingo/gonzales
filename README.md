@@ -2,7 +2,7 @@
 
 After struggling with some slow running tests you will probably want to speed them up. Factory girl is somewhat slow, because it will try to create new records in the database before each test is running. Fixtures works much faster but with less flexibility.
 
-Using Gonzales, reduced my unit-tests time from 1 minute 40 seconds, down to 32 seconds.
+Using Gonzales, reduced my unit-tests time from 1 minute 40 seconds, down to 28 seconds.
 
 Well, Gonzales makes the best out of Factory Girl, by allowing you to load the factories into the database before the tests starts. 
 You just have to learn one new keyword - ```speedy```. You will use ```speedy``` for:
