@@ -59,6 +59,7 @@ module Gonzales
       end
 
       def load #:nodoc:
+        return {} if Gonzales.disable_preload
         begin
           YAML::load_file cache_filename
         rescue Errno::ENOENT

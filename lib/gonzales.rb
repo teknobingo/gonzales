@@ -28,11 +28,12 @@ module Gonzales
   #
   # == Configutations
   #
-  #   * factory_module - the module containing the definitions of factories to be store in the test database.
-  #                      Defaults to +test/speedy.rb+
-  #   * factory_cache  - the entity lookup yaml-file to store factories that was save to the database when Gonzales.initialize! was run
-  #                      Defaults to +test/speedy.yml+
-  #
+  #   * factory_module  - the module containing the definitions of factories to be store in the test database.
+  #                       Defaults to +test/speedy.rb+
+  #   * factory_cache   - the entity lookup yaml-file to store factories that was save to the database when Gonzales.initialize! was run
+  #                       Defaults to +test/speedy.yml+
+  #   * disable_preload - Set to true if you want to disable preload for integration tests. If you are using database cleaner, you
+  #                       will probably also set this one to true.
   # === Example 
   #
   # Gonzales.configure do |config|
@@ -45,7 +46,7 @@ module Gonzales
   autoload :TestHelper, 'gonzales/test_helper'
   
   include ActiveSupport::Configurable
-  config_accessor :factory_module, :factory_cache
+  config_accessor :factory_module, :factory_cache, :disable_preload
   
   # Runs the initialization of Gonzales. Put this in a rake task for your application.
   #
@@ -62,7 +63,7 @@ module Gonzales
   #   end
   #
   def self.initialize!
-    load factory_module || Rails.root.join('test', 'speedy.rb')
+    load(factory_module || Rails.root.join('test', 'speedy.rb')) unless disable_preload
   end
 end
 
