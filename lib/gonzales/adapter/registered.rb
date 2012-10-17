@@ -22,37 +22,16 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 module Gonzales
-  # = Gonzales::Factories
-  #
-  # Facitity to instantiate factories in database during db:test:prepare
-  class Factories
-    # Save a factory based record to the test database before executing tests
+  module Adapter
+    # = Gonzales::Adapters::Registered
     #
-    # === Arguments
-    #  * alias_name - optional alias name (can be used to reference factory or associations later)
-    #  * factory_name - the name of the factory (use to reference factory or associations later if alias is not given)
-    #  * options - a hash to be passed to FactoryGirl when creating the record
-    #
-    # === Examples
-    #   Gonzales::Factories.load do |go|
-    #     go.speedy :address
-    #     go.speedy :organization
-    #     go.speedy :john, :person, :name => 'John'
-    #   end
-    #
-    def self.speedy(factory_or_alias_name, *args)
-      alias_name = factory_or_alias_name
-      options = args.extract_options!
-      factory_name = args.first || alias_name
-      Collection.add alias_name, Factory.create(factory_name, options)
-    end
-    
-    # Yields a block to define speedy statements, then saves a collection of references to a temporary file
-    def self.load(&block)
-      Collection.clear_cache
-      ::FactoryGirl.reload
-      yield self
-      Collection.save
+    class Registered
+      # Facitity to instantiate factories in database during db:test.
+      # The record will be registered in the collection when created.
+      #
+      def self.create(factory_name, *options)
+        Gonzales::Factories.speedy(factory_name, *options)
+      end
     end
   end
 end

@@ -32,12 +32,12 @@ class Gonzales::TestHelperTest < ActiveSupport::TestCase
     end
     should 'call factory if not cached' do
       Gonzales::Collection.expects(:entity).with(:manolo).returns(nil)
-      Factory.expects(:create).with(:manolo).returns(:munoz)
+      Gonzales::Adapter.expects(:create).with(:manolo).returns(:munoz)
       assert_equal :munoz, speedy(:manolo)
     end
     should 'call factory with parameters if not cached' do
       Gonzales::Collection.expects(:entity).with(:elmer).returns(nil)
-      Factory.expects(:create).with(:elmer, :fudd).returns(:midd)
+      Gonzales::Adapter.expects(:create).with(:elmer, :fudd).returns(:midd)
       assert_equal :midd, speedy(:elmer, :fudd)      
     end
   end

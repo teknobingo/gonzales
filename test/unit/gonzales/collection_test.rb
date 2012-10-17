@@ -52,7 +52,7 @@ class Gonzales::CollectionTest < ActiveSupport::TestCase
     end
   end
   
-  context 'publich method' do
+  context 'public method' do
     context 'add' do      
       should 'store entity' do
         class Entity
@@ -74,6 +74,13 @@ class Gonzales::CollectionTest < ActiveSupport::TestCase
         Entity.expects(:find).never
         @entities.expects(:[]).with(:entity).returns(nil)
         assert_nil @coll.entity(:entity)
+      end
+    end
+    context 'cache' do
+      should 'be cleared upon request' do
+        @coll.class_variable_set :@@entities, {:ugh => 1}
+        @coll.clear_cache
+        assert_equal ({}), @coll.class_variable_get( :@@entities)
       end
     end
   end

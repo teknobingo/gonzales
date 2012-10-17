@@ -49,14 +49,14 @@ class Gonzales::FactoryGirl::DefinitionProxyTest < ActiveSupport::TestCase
     should 'instantiate factory with default attribute' do
       DefinitionProxyTest.expects(:reflect_on_association).with(:sylvester).returns(@reflection)
       Gonzales::Collection.expects(:entity).with(:sylvester).returns(nil)
-      Factory.expects(:create).with(:sylvester, {}).returns(:cat)
+      Gonzales::Adapter.expects(:create).with(:sylvester, {}).returns(:cat)
       @proxy.speedy(:sylvester)
       assert_equal :cat, @proxy.sylvester
     end
     should 'instantiate factory with defined attribute' do
       DefinitionProxyTest.expects(:reflect_on_association).with(:sylvester).returns(@reflection)
       Gonzales::Collection.expects(:entity).with(:elmer).returns(nil)
-      Factory.expects(:create).with(:elmer, {}).returns(:cat)
+      Gonzales::Adapter.expects(:create).with(:elmer, {}).returns(:cat)
       @proxy.speedy(:sylvester, :elmer)
       assert_equal :cat, @proxy.sylvester
     end
@@ -64,14 +64,14 @@ class Gonzales::FactoryGirl::DefinitionProxyTest < ActiveSupport::TestCase
       DefinitionProxyTest.expects(:reflect_on_association).with(:sylvester).returns(@reflection)
       @proxy.sylvester = :already_set
       Gonzales::Collection.expects(:entity).never
-      Factory.expects(:create).never
+      Gonzales::Adapter.expects(:create).never
       @proxy.speedy(:sylvester)
       assert_equal :already_set, @proxy.sylvester
     end
     should 'load entity from cache if it is there' do
       DefinitionProxyTest.expects(:reflect_on_association).with(:sylvester).returns(@reflection)
       Gonzales::Collection.expects(:entity).with(:sylvester).returns(:cat)
-      Factory.expects(:create).never
+      Gonzales::Adapter.expects(:create).never
       @proxy.speedy(:sylvester)
       assert_equal :cat, @proxy.sylvester
     end

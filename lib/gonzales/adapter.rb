@@ -21,38 +21,29 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 module Gonzales
-  # = Gonzales::Factories
+  # = Gonzales::Adapter
   #
-  # Facitity to instantiate factories in database during db:test:prepare
-  class Factories
-    # Save a factory based record to the test database before executing tests
-    #
-    # === Arguments
-    #  * alias_name - optional alias name (can be used to reference factory or associations later)
-    #  * factory_name - the name of the factory (use to reference factory or associations later if alias is not given)
-    #  * options - a hash to be passed to FactoryGirl when creating the record
-    #
-    # === Examples
-    #   Gonzales::Factories.load do |go|
-    #     go.speedy :address
-    #     go.speedy :organization
-    #     go.speedy :john, :person, :name => 'John'
-    #   end
-    #
-    def self.speedy(factory_or_alias_name, *args)
-      alias_name = factory_or_alias_name
-      options = args.extract_options!
-      factory_name = args.first || alias_name
-      Collection.add alias_name, Factory.create(factory_name, options)
-    end
+  # Adapter for instantiating factories in database
+  module Adapter
+    autoload :Registered,     'gonzales/adapter/registered'
+    autoload :Unregistered,   'gonzales/adapter/unregistered'
     
-    # Yields a block to define speedy statements, then saves a collection of references to a temporary file
-    def self.load(&block)
-      Collection.clear_cache
-      ::FactoryGirl.reload
-      yield self
-      Collection.save
+    # Instantiates a record in the database with the defined factory. This is an internal method.
+    #
+    # The method will call either registered or unregistered adapter, depending on what was defined in the use method.
+    #
+    def self.create(factory_name, *options)
+      @@adapter ||= Unregistered
+      @@adapter.create(factory_name, *options)
+    end
+   
+    # Sets the adapter to be used for instantiating objects based on predefioned factories. Internal.
+    #
+    def self.use(name)
+      raise ArgumentError unless %w(registered unregistered).include? name.to_s
+      @@adapter = "#{self}::#{name.to_s.classify}".constantize
     end
   end
 end

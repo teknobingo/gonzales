@@ -63,11 +63,11 @@ module Gonzales
             if r.send(attribute).size == 0
               factory_names = args.size > 0 ? args : [attribute]
               r.send("#{attribute}=",
-                factory_names.collect { |factory_name| Gonzales::Collection.entity(factory_name) || Factory.create(factory_name, options) }) 
+                factory_names.collect { |factory_name| Collection.entity(factory_name) || Adapter.create(factory_name, options) }) 
             end
           elsif !r.send(attribute)
             factory_name = args.first || attribute
-            r.send("#{attribute}=", Gonzales::Collection.entity(factory_name) || Factory.create(factory_name, options))
+            r.send("#{attribute}=", Collection.entity(factory_name) || Adapter.create(factory_name, options))
           end
         end
       end

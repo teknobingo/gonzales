@@ -44,6 +44,8 @@ class Gonzales::FactoriesTest < ActiveSupport::TestCase
   
   context 'load' do
     should 'yield context' do
+      Gonzales::Collection.expects(:clear_cache).once
+      ::FactoryGirl.expects(:reload).once
       Gonzales::Collection.expects(:save).once
       Gonzales::Factories.load do |context|
         assert_equal Gonzales::Factories, context

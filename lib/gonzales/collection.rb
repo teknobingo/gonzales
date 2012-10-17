@@ -31,6 +31,7 @@ module Gonzales
       # Adds an object (entity) to the collection.
       def add(name, object)
         entities[name] = { :class => object.class.to_s, :id => object.id }
+        object
       end
       
       # Retrieves the collection of entities.
@@ -51,6 +52,11 @@ module Gonzales
         File.open(cache_filename, "w+") do |file|
           file.write entities.to_yaml
         end
+      end
+      
+      # Clears the cache of objects collected from load or instantiation
+      def clear_cache
+        @@entities = {}
       end
       
     private

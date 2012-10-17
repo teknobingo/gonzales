@@ -2,7 +2,7 @@
 
 After struggling with some slow running tests you will probably want to speed them up. Factory girl is somewhat slow, because it will try to create new records in the database before each test is running. Fixtures works much faster but with less flexibility.
 
-Using Gonzales, reduced my unit-tests time from 1 minute 40 seconds, down to 28 seconds.
+Using Gonzales, reduced my unit-tests time from 1 minute 40 seconds, down to 24 seconds.
 
 Well, Gonzales makes the best out of Factory Girl, by allowing you to load the factories into the database before the tests starts. 
 You just have to learn one new keyword - ```speedy```. You will use ```speedy``` for:
@@ -103,5 +103,42 @@ end
 ```
 
 If the factory has not been pre-created speedy will just call Factory.create. And of course, if you want to, you can still use Factory.build or Factory.create, but then they will work like traditional FactoryGirl usage.
+
+## Using speedy with integration tests
+
+If you are using (DatabaseCleaner)[https://github.com/bmabey/database_cleaner], and probably (Capybara)[https://github.com/jnicklas/capybara], when running integration tests, you will probably face some challenges. However, do not despair, you may be able to work around this. Since you do not want to load all your factories in advance, you can let Gonzales load them as you need them. I recomment the following settings in your integration_test_helper file:
+
+``` Ruby
+
+Gonzales.configure do |config|
+  config.disable_preload = true         # ensures that the spoeedy file is not loaded when initializing Gonzales
+  config.adapter = :registered          # ensures factories created are cached as they would be when loaded from speedy file.
+end
+
+module ActionDispatch
+  class IntegrationTest
+    include Capybara::DSL
+    # Stop ActiveRecord from wrapping tests in transactions
+    self.use_transactional_fixtures = false
+    DatabaseCleaner.clean                 # Truncate the database before tests are run the first time
+    Gonzales.initialize!                  # Ensure any cache is cleared before we run the tests
+
+    teardown do
+      DatabaseCleaner.clean               # Truncate the database
+      Capybara.reset_sessions!            # Forget the (simulated) browser state
+      Capybara.use_default_driver         # Revert Capybara.current_driver to Capybara.default_driver
+      Gonzales.initialize!                # Ensure cache is cleared after running each test
+    end
+
+    def capture_and_open_screen
+      tmp = Tempfile.new('capture_and_open_screen')
+      tmp.close
+      system("screencapture -P #{tmp.path}")
+      system("open -a Preview \"file://#{tmp.path}\"")
+    end
+  end
+end
+```
+
 
 Thats all there is to it. Speedy coding!

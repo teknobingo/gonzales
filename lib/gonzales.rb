@@ -26,27 +26,38 @@ require 'active_support/configurable'
 module Gonzales
   # = Gonzales provides a mechanism for speeding up tests when using FactoryGirl
   #
-  # == Configutations
+  autoload :Adapter,    'gonzales/adapter'
+  autoload :Collection, 'gonzales/collection'
+  autoload :Factories,  'gonzales/factories'
+  autoload :TestHelper, 'gonzales/test_helper'
+
+  include ActiveSupport::Configurable
+  
+  # == Configurations
   #
   #   * factory_module  - the module containing the definitions of factories to be store in the test database.
   #                       Defaults to +test/speedy.rb+
   #   * factory_cache   - the entity lookup yaml-file to store factories that was save to the database when Gonzales.initialize! was run
   #                       Defaults to +test/speedy.yml+
-  #   * disable_preload - Set to true if you want to disable preload for integration tests. If you are using database cleaner, you
+  #   * disable_preload - Set to true if you want to disable preload for integration tests. If you are using database_cleaner, you
   #                       will probably also set this one to true.
+  #   * adapter         - Set to either :registered or :unregistered. When using database_cleaner with integration_tests and you want
+  #                       to reuse associations decleared with speedy, you should set this value to :registered
   # === Example 
   #
   # Gonzales.configure do |config|
   #   config.factory_module = Rails.root.join('tmp', 'gonzales.yml')
   #   config.factory_cache =  Rails.root.join('test', 'speedy.rb')
   # end
-  
-  autoload :Collection, 'gonzales/collection'
-  autoload :Factories,  'gonzales/factories'
-  autoload :TestHelper, 'gonzales/test_helper'
-  
-  include ActiveSupport::Configurable
-  config_accessor :factory_module, :factory_cache, :disable_preload
+  config_accessor :factory_module, :factory_cache, :disable_preload, :adapter
+
+  self.config.class.redefine_method(:adapter=) do |name|
+    Gonzales::Adapter.use name
+  end
+
+  # def self.adapter=(name)
+  #   Adapter.use name
+  # end
   
   # Runs the initialization of Gonzales. Put this in a rake task for your application.
   #
@@ -63,7 +74,11 @@ module Gonzales
   #   end
   #
   def self.initialize!
-    load(factory_module || Rails.root.join('test', 'speedy.rb')) unless disable_preload
+    unless disable_preload
+      load(factory_module || Rails.root.join('test', 'speedy.rb'))
+    else
+      Collection.clear_cache
+    end
   end
 end
 
