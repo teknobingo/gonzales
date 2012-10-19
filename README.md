@@ -129,13 +129,6 @@ module ActionDispatch
       Capybara.use_default_driver         # Revert Capybara.current_driver to Capybara.default_driver
       Gonzales.initialize!                # Ensure cache is cleared after running each test
     end
-
-    def capture_and_open_screen
-      tmp = Tempfile.new('capture_and_open_screen')
-      tmp.close
-      system("screencapture -P #{tmp.path}")
-      system("open -a Preview \"file://#{tmp.path}\"")
-    end
   end
 end
 ```
