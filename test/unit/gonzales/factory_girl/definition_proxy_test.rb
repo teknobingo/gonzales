@@ -75,9 +75,15 @@ class Gonzales::FactoryGirl::DefinitionProxyTest < ActiveSupport::TestCase
       @proxy.speedy(:sylvester)
       assert_equal :cat, @proxy.sylvester
     end
+    should 'raise exception when association is not defined' do
+      DefinitionProxyTest.expects(:reflect_on_association).with(:sylvester).raises(NoMethodError.new("undefined method `macro' for nil:NilClass"))
+      assert_raises Gonzales::UndefinedAssociation do
+        @proxy.speedy(:sylvester)
+      end
+    end
   end
 
-  context 'speedy has_many and has_and_belongs_to_many association' do
+  context 'speedy has_many association' do
     setup do
       @proxy.cartoons = []
     end

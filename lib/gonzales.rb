@@ -22,6 +22,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 require 'active_support/configurable'
+require 'gonzales/exceptions'
 
 module Gonzales
   # = Gonzales provides a mechanism for speeding up tests when using FactoryGirl

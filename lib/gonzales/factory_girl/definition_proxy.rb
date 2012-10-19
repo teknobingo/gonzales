@@ -59,15 +59,23 @@ module Gonzales
         attribute = attribute_or_factory
         options = args.extract_options!
         after_build do |r|
-          if r.class.reflect_on_association(attribute).macro.to_s.include? 'has_and_belongs_to_many'
-            if r.send(attribute).size == 0
-              factory_names = args.size > 0 ? args : [attribute]
-              r.send("#{attribute}=",
-                factory_names.collect { |factory_name| Collection.entity(factory_name) || Adapter.create(factory_name, options) }) 
+          begin
+            if r.class.reflect_on_association(attribute).macro.to_s.include? 'has_and_belongs_to_many'
+              if r.send(attribute).size == 0
+                factory_names = args.size > 0 ? args : [attribute]
+                r.send("#{attribute}=",
+                  factory_names.collect { |factory_name| Collection.entity(factory_name) || Adapter.create(factory_name, options) }) 
+              end
+            elsif !r.send(attribute)
+              factory_name = args.first || attribute
+              r.send("#{attribute}=", Collection.entity(factory_name) || Adapter.create(factory_name, options))
             end
-          elsif !r.send(attribute)
-            factory_name = args.first || attribute
-            r.send("#{attribute}=", Collection.entity(factory_name) || Adapter.create(factory_name, options))
+          rescue NoMethodError => e
+            if e.message.include? 'macro'
+              raise UndefinedAssociation.new("association #{attribute} is undefined")
+            else
+              raise e
+            end
           end
         end
       end
